@@ -31,7 +31,7 @@ export interface HeroModalProps {
     onClick: () => void | Promise<void>
     isLoading?: boolean
     disabled?: boolean
-    variant?: "default" | "outline" | "secondary" | "ghost" | "destructive" | "link"
+    variant?: any
   }
   secondaryAction?: {
     label: string
@@ -287,7 +287,7 @@ export function HeroModal({
                 disabled={primaryAction.disabled || primaryAction.isLoading}
                 className={cn(
                   "cursor-pointer font-medium shadow-sm transition-all duration-200",
-                  primaryAction.variant === "gradient" && "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white border-0"
+                  primaryAction?.variant === "gradient" && "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white border-0"
                 )}
               >
                 {primaryAction.isLoading ? (
