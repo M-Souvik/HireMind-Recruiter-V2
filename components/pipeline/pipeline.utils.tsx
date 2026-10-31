@@ -1,5 +1,6 @@
 import {
   BrainCircuitIcon,
+  CalendarClockIcon,
   CheckCircle2Icon,
   ClipboardListIcon,
   FileTextIcon,
@@ -71,6 +72,62 @@ export function VerdictBadge({ verdict }: { verdict: Verdict }) {
     <span className="pp-verdict pp-verdict--hold">
       <MinusCircleIcon size={11} />
       {verdict}
+    </span>
+  )
+}
+
+// ── Round status badge ────────────────────────────────────────────────────────
+
+export type NormalizedRoundStatus = "IN_PROGRESS" | "ENDED" | "SCHEDULED" | "OTHER"
+
+export function normalizeRoundStatus(rawStatus?: string): NormalizedRoundStatus {
+  if (!rawStatus) return "SCHEDULED"
+  const s = rawStatus.trim().toUpperCase()
+  if (s === "IN_PROGRESS" || s === "INPROGRESS" || s === "IN-PROGRESS" || s === "ACTIVE") {
+    return "IN_PROGRESS"
+  }
+  if (s === "ENDED" || s === "COMPLETED" || s === "FINISHED" || s === "CLOSED") {
+    return "ENDED"
+  }
+  if (s === "SCHEDULED" || s === "PENDING" || s === "UPCOMING") {
+    return "SCHEDULED"
+  }
+  return "OTHER"
+}
+
+export function RoundStatusBadge({ status }: { status?: string }) {
+  const normalized = normalizeRoundStatus(status)
+
+  if (normalized === "IN_PROGRESS") {
+    return (
+      <span className="pp-col-status pp-col-status--in_progress">
+        <span className="pp-status-dot pp-status-dot--pulse" />
+        In Progress
+      </span>
+    )
+  }
+
+  if (normalized === "ENDED") {
+    return (
+      <span className="pp-col-status pp-col-status--ended">
+        <CheckCircle2Icon size={11} />
+        Ended
+      </span>
+    )
+  }
+
+  if (normalized === "SCHEDULED") {
+    return (
+      <span className="pp-col-status pp-col-status--scheduled">
+        <CalendarClockIcon size={11} />
+        Scheduled
+      </span>
+    )
+  }
+
+  return (
+    <span className="pp-col-status pp-col-status--other">
+      {status || "Unknown"}
     </span>
   )
 }

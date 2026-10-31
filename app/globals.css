@@ -1504,6 +1504,12 @@
   border: 1px solid oklch(0.75 0.18 80 / 25%);
 }
 
+.jl-badge--scheduled {
+  background: oklch(0.55 0.28 292 / 12%);
+  color: oklch(0.72 0.20 292);
+  border: 1px solid oklch(0.55 0.28 292 / 25%);
+}
+
 /* ── Meta row ───────────────────────────────────────────────────────────── */
 .jl-meta-row {
   display: flex;
@@ -1986,34 +1992,108 @@
   font-weight: 500;
 }
 
-/* Stage status dot */
+/* Stage status badge */
 .pp-col-status {
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 0.15rem 0.5rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
-.pp-col-status--scheduled {
-  background: oklch(0.55 0.18 230 / 12%);
-  color: oklch(0.42 0.16 230);
+.pp-col-status svg {
+  flex-shrink: 0;
 }
 
+/* 1. IN_PROGRESS / active */
+.pp-col-status--in_progress,
 .pp-col-status--active {
-  background: oklch(0.55 0.18 160 / 15%);
-  color: oklch(0.38 0.16 160);
+  background: oklch(0.55 0.18 160 / 12%);
+  color: oklch(0.42 0.16 160);
+  border: 1px solid oklch(0.55 0.18 160 / 25%);
 }
 
+/* 2. ENDED / completed */
+.pp-col-status--ended,
 .pp-col-status--completed {
-  background: oklch(0.491 0.27 292.581 / 10%);
-  color: oklch(0.491 0.27 292.581);
+  background: oklch(0.40 0.02 260 / 10%);
+  color: oklch(0.45 0.02 260);
+  border: 1px solid oklch(0 0 0 / 12%);
 }
 
+/* 3. SCHEDULED */
+.pp-col-status--scheduled {
+  background: oklch(0.75 0.18 80 / 12%);
+  color: oklch(0.50 0.16 80);
+  border: 1px solid oklch(0.75 0.18 80 / 25%);
+}
+
+.pp-col-status--other,
 .pp-col-status--cancelled {
   background: oklch(0.577 0.245 27 / 10%);
   color: oklch(0.577 0.245 27);
+  border: 1px solid oklch(0.577 0.245 27 / 20%);
+}
+
+/* Dark mode adjustments */
+:is(.dark *) .pp-col-status--in_progress,
+:is(.dark *) .pp-col-status--active {
+  background: oklch(0.55 0.18 160 / 18%);
+  color: oklch(0.72 0.18 160);
+  border-color: oklch(0.55 0.18 160 / 35%);
+}
+
+:is(.dark *) .pp-col-status--ended,
+:is(.dark *) .pp-col-status--completed {
+  background: oklch(0.35 0.02 260 / 20%);
+  color: oklch(0.68 0.02 260);
+  border-color: oklch(1 0 0 / 14%);
+}
+
+:is(.dark *) .pp-col-status--scheduled {
+  background: oklch(0.75 0.18 80 / 16%);
+  color: oklch(0.78 0.16 80);
+  border-color: oklch(0.75 0.18 80 / 30%);
+}
+
+:is(.dark *) .pp-col-status--other,
+:is(.dark *) .pp-col-status--cancelled {
+  background: oklch(0.577 0.245 27 / 15%);
+  color: oklch(0.75 0.20 27);
+  border-color: oklch(0.577 0.245 27 / 30%);
+}
+
+/* Pulsing live dot for IN_PROGRESS */
+.pp-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.pp-status-dot--pulse {
+  animation: pp-pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pp-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
 }
 
 /* Vertical connector from node to cards */
@@ -4215,6 +4295,106 @@
   color: oklch(0.65 0.18 292);
 }
 
+/* ── Publishing Mode Toggle Cards ──────────────────────── */
+.cjf-toggle-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.cjf-toggle-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  background: oklch(0.22 0.012 265);
+  border: 1.5px solid oklch(1 0 0 / 10%);
+  color: oklch(0.65 0.015 265);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-family: inherit;
+  text-align: left;
+}
+
+.cjf-toggle-card:hover {
+  border-color: oklch(0.55 0.25 292 / 50%);
+  color: oklch(0.85 0.015 265);
+  background: oklch(0.55 0.28 292 / 8%);
+}
+
+.cjf-toggle-card--active {
+  background: linear-gradient(135deg, oklch(0.52 0.28 292 / 18%), oklch(0.44 0.24 270 / 18%));
+  border-color: oklch(0.55 0.28 292 / 60%);
+  color: oklch(0.95 0.005 265);
+  box-shadow: 0 0 0 1px oklch(0.55 0.28 292 / 20%);
+}
+
+.cjf-toggle-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: oklch(1 0 0 / 6%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: oklch(0.65 0.015 265);
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.cjf-toggle-card--active .cjf-toggle-card-icon {
+  background: oklch(0.52 0.28 292 / 25%);
+  color: oklch(0.85 0.18 292);
+}
+
+.cjf-toggle-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.cjf-toggle-card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: oklch(0.92 0.005 265);
+}
+
+.cjf-toggle-card-desc {
+  font-size: 0.75rem;
+  color: oklch(0.50 0.01 265);
+  line-height: 1.3;
+}
+
+.cjf-toggle-card--active .cjf-toggle-card-desc {
+  color: oklch(0.70 0.08 292);
+}
+
+.cjf-toggle-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid oklch(1 0 0 / 20%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+
+.cjf-toggle-card--active .cjf-toggle-radio {
+  border-color: oklch(0.75 0.18 292);
+}
+
+.cjf-toggle-radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: oklch(0.75 0.18 292);
+}
+
 /* ── Summary card ───────────────────────────────────────── */
 .cjf-summary {
   background: oklch(0.20 0.012 265 / 60%);
@@ -4356,6 +4536,10 @@
   .cjf-salary-row {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .cjf-toggle-group {
+    grid-template-columns: 1fr;
   }
 
   .cjf-salary-sep {

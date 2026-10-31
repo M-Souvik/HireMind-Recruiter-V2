@@ -9,7 +9,17 @@ export type RoundType =
   | "final"
   | string
 
-export type RoundStatus = "scheduled" | "active" | "completed" | "cancelled" | string
+export type RoundStatus =
+  | "IN_PROGRESS"
+  | "in_progress"
+  | "active"
+  | "ENDED"
+  | "ended"
+  | "completed"
+  | "SCHEDULED"
+  | "scheduled"
+  | "cancelled"
+  | string
 
 export interface Round {
   _id: string

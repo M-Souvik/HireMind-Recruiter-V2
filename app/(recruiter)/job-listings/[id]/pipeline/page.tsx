@@ -19,7 +19,8 @@ import { getAccessToken } from "@/lib/utils"
 import { useApplicationResultMutation } from "@/mutations/application"
 import { useEndRoundMutation } from "@/mutations/round"
 import { HeroModal } from "@/components/ui/HeroModal"
-import { roundLabel } from "@/components/pipeline/pipeline.utils"
+import { roundLabel, RoundStatusBadge } from "@/components/pipeline/pipeline.utils"
+import { useGetJobDetailQuery } from "@/queries/job"
 
 
 export default function PipelinePage() {
@@ -32,6 +33,8 @@ export default function PipelinePage() {
   const { mutate: mutateApplicationResult, isPending: isApplicationResultPending, isError: isApplicationResultError, error: applicationResultError } = useApplicationResultMutation();
 
   const { mutate: mutateEndRound, isPending: isEndRoundPending, isError: isEndRoundError, error: endRoundError } = useEndRoundMutation();
+  const { data: job, isLoading: isJobLoading, error: jobError } = useGetJobDetailQuery(jobId);
+
 
   const [rounds, setRounds] = useState<Round[]>([])
   const [candidates, setCandidates] = useState<PipelineCandidate[]>([])
@@ -55,7 +58,7 @@ export default function PipelinePage() {
   const [refreshKey, setRefreshKey] = useState(0)
 
   // ── Data fetching ───────────────────────────────────────────────────────────
-
+  console.log("job detils: ", job)
   useEffect(() => {
 
     const fetchAll = async () => {
@@ -247,6 +250,8 @@ export default function PipelinePage() {
         jobId={jobId}
         currentRoundCount={rounds.length}
         onConfirm={handleAddRound}
+        startDate={job?.start_time}
+        endDate={job?.end_time}
       />
 
       {/* End Round Confirmation modal */}
@@ -269,10 +274,11 @@ export default function PipelinePage() {
       >
         <div className="space-y-2 py-2">
           {roundIdToEnd && rounds.find((r) => r._id === roundIdToEnd) && (
-            <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 text-amber-600 dark:text-amber-400">
+            <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 text-amber-600 dark:text-amber-400 flex items-center justify-between">
               <span className="font-semibold">
                 Round: {roundLabel(rounds.find((r) => r._id === roundIdToEnd)!.type)} (Stage {rounds.find((r) => r._id === roundIdToEnd)!.order})
               </span>
+              <RoundStatusBadge status={rounds.find((r) => r._id === roundIdToEnd)!.status} />
             </div>
           )}
           <p className="text-muted-foreground text-xs leading-normal">

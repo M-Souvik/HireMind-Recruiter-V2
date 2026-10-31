@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   BrainCircuitIcon,
   BotIcon,
@@ -82,11 +82,11 @@ function StepRoundType({
         Choose the type of round you want to add to the pipeline.
       </p>
 
-      <div className="ar-type-grid">
+      <div className="flex gap-2 max-w-full">
         {ROUND_TYPE_OPTIONS.map((opt) => (
           <button
             key={opt.id}
-            className={`ar-type-card ${selected === opt.id ? "ar-type-card--selected" : ""}`}
+            className={`ar-type-card w-90  ${selected === opt.id ? "ar-type-card--selected" : ""}`}
             onClick={() => onSelect(opt.id)}
             aria-pressed={selected === opt.id}
           >
@@ -129,10 +129,12 @@ interface AssessmentFields {
 }
 
 function StepSchedule({
+  dateDisabled,
   fields,
   onChange,
   showLink,
 }: {
+  dateDisabled?: boolean
   fields: ScheduleFields
   onChange: (fields: ScheduleFields) => void
   showLink: boolean
@@ -158,6 +160,7 @@ function StepSchedule({
             id="ar-start"
             type="datetime-local"
             className="ar-input"
+            disabled={dateDisabled}
             value={fields.start_time}
             onChange={(e) => set("start_time", e.target.value)}
           />
@@ -174,6 +177,8 @@ function StepSchedule({
             type="datetime-local"
             className="ar-input"
             value={fields.end_time}
+            disabled={dateDisabled}
+
             min={fields.start_time || undefined}
             onChange={(e) => set("end_time", e.target.value)}
           />
@@ -277,12 +282,12 @@ function StepAssessment({
 
                 {isSelected ? <CheckIcon size={20} /> : null}
 
-              <div className="ar-question-paper-info">
-                <span className="ar-question-paper-name">{question.name}</span>
-                <span className="ar-question-paper-meta">
-                  {question.total_questions} questions · {question.total_marks} marks
-                </span>
-              </div>
+                <div className="ar-question-paper-info">
+                  <span className="ar-question-paper-name">{question.name}</span>
+                  <span className="ar-question-paper-meta">
+                    {question.total_questions} questions · {question.total_marks} marks
+                  </span>
+                </div>
               </div>
               <button
                 type="button"
@@ -336,13 +341,12 @@ function StepIndicator({
         <div key={step.name} className="ar-stepper-item">
           <div className="ar-stepper-node">
             <div
-              className={`ar-stepper-dot ${
-                i === current
-                  ? "ar-stepper-dot--active"
-                  : i < current
-                    ? "ar-stepper-dot--done"
-                    : ""
-              }`}
+              className={`ar-stepper-dot ${i === current
+                ? "ar-stepper-dot--active"
+                : i < current
+                  ? "ar-stepper-dot--done"
+                  : ""
+                }`}
             >
               {i < current ? <CheckCircle2Icon size={12} /> : i + 1}
             </div>
@@ -355,12 +359,12 @@ function StepIndicator({
               <span className="ar-stepper-description">{step.description}</span>
             </div>
           </div>
-          {i < visibleSteps.length - 1 &&(
+          {i < visibleSteps.length - 1 && (
             <div className="flex w-full">
               <div className="ar-stepper-line" />
 
             </div>
-             )}
+          )}
         </div>
       ))}
     </div>
@@ -382,6 +386,14 @@ export interface CreateRoundPayload {
   order: number        // rounds.length + 1
 }
 
+function toLocalDatetimeValue(iso?: string): string {
+  if (!iso) return ""
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return ""
+  const pad = (n: number) => String(n).padStart(2, "0")
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 // ── Add Round Modal ────────────────────────────────────────────────────────────
 
 interface AddRoundModalProps {
@@ -389,6 +401,8 @@ interface AddRoundModalProps {
   onClose: () => void
   jobId: string
   currentRoundCount: number
+  startDate: string | undefined,
+  endDate: string | undefined,
   /** Called with the full payload ready to POST */
   onConfirm: (payload: CreateRoundPayload) => void
 }
@@ -399,6 +413,8 @@ export function AddRoundModal({
   jobId,
   currentRoundCount,
   onConfirm,
+  startDate,
+  endDate
 }: AddRoundModalProps) {
   const [step, setStep] = useState(0)
   const [selectedType, setSelectedType] = useState<RoundTypeOption["id"] | null>(null)
@@ -458,17 +474,27 @@ export function AddRoundModal({
         : {}),
       ...(selectedType === "assessment"
         ? {
-            assessment_name: assessment.assessment_name.trim(),
-            question_paper_id: assessment.question_paper_id,
-            assessment_duration: assessment.assessment_duration.trim(),
-            assessment_type: assessment.assessment_type.trim(),
-          }
+          assessment_name: assessment.assessment_name.trim(),
+          question_paper_id: assessment.question_paper_id,
+          assessment_duration: assessment.assessment_duration.trim(),
+          assessment_type: assessment.assessment_type.trim(),
+        }
         : {}),
     }
 
     onConfirm(payload)
     handleClose()
   }
+
+  useEffect(() => {
+    if (selectedType === "ai_screen") {
+      setSchedule((prev) => ({
+        ...prev,
+        start_time: toLocalDatetimeValue(startDate),
+        end_time: toLocalDatetimeValue(endDate),
+      }))
+    }
+  }, [selectedType, startDate, endDate])
 
   return (
     <Modal open={open} onClose={handleClose} title="Add New Round" maxWidth="640px">
@@ -481,29 +507,31 @@ export function AddRoundModal({
       )}
       {step === 1 && (
         selectedType !== "assessment" ? (
-        <StepSchedule
-          fields={schedule}
-          onChange={setSchedule}
-          showLink={showLink}
-        />
-      ):(
-        <StepAssessment
-          fields={assessment}
-          onChange={setAssessment}
-          // showLink={showLink}
-        />
-      )
-    )}
+          <StepSchedule
 
-    {step === 2 && 
+            fields={schedule}
+            onChange={setSchedule}
+            showLink={showLink}
+          />
+        ) : (
+          <StepAssessment
+            fields={assessment}
+            onChange={setAssessment}
+          // showLink={showLink}
+          />
+        )
+      )}
+
+      {step === 2 &&
         (
-        <StepSchedule
-          fields={schedule}
-          onChange={setSchedule}
-          showLink={showLink}
-        />
-      
-    )}
+          <StepSchedule
+            dateDisabled={selectedType == "assessment"}
+            fields={schedule}
+            onChange={setSchedule}
+            showLink={showLink}
+          />
+
+        )}
 
       {/* Footer actions */}
       <div className="ar-footer">

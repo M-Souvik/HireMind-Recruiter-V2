@@ -13,6 +13,8 @@ export interface CreateJobPayload {
   loc_type: string | null
   start_time: string // ISO string
   end_time: string // ISO string
+  status: "open" | "scheduled" | string
+  validity: number
 }
 
 export interface CreateJobResponse {

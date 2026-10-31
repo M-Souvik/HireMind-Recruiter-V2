@@ -2,7 +2,7 @@
 
 import type { PipelineCandidate, Round } from "@/types/pipeline"
 import { RoundMenu } from "./RoundMenu"
-import { roundIcon, roundLabel } from "./pipeline.utils"
+import { roundIcon, roundLabel, RoundStatusBadge, normalizeRoundStatus } from "./pipeline.utils"
 
 interface RoundColumnProps {
   round: Round
@@ -23,6 +23,8 @@ export function RoundColumn({
   onAddRound,
   onEndRound,
 }: RoundColumnProps) {
+  const isEnded = normalizeRoundStatus(round.status) === "ENDED"
+
   return (
     <div className="pp-column">
       {/* Node row: connectors + pill + three-dot */}
@@ -48,15 +50,13 @@ export function RoundColumn({
             <span className="pp-col-node-label">{roundLabel(round.type)}</span>
             <span className="pp-col-node-order">Stage {round.order}</span>
           </div>
-          <span className={`pp-col-status pp-col-status--${round.status}`}>
-            {round.status}
-          </span>
-
-          {/* Three-dot menu */}
-          <RoundMenu
-            onAddRound={onAddRound}
-            onEndRound={() => onEndRound(round._id)}
-          />
+          <RoundStatusBadge status={round.status} />
+          {!isEnded && (
+            <RoundMenu
+              onAddRound={onAddRound}
+              onEndRound={() => onEndRound(round._id)}
+            />
+          )}
         </div>
 
         {/* Right connector */}

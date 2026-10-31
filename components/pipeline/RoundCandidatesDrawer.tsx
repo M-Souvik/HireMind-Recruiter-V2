@@ -8,7 +8,7 @@ import {
   XCircleIcon,
 } from "lucide-react"
 import type { CandidatesResponse, PipelineCandidate, Round } from "@/types/pipeline"
-import { roundIcon, roundLabel } from "./pipeline.utils"
+import { roundIcon, roundLabel, RoundStatusBadge } from "./pipeline.utils"
 import { CandidateCard } from "./CandidateCard"
 import { useRoundCandidatesQuery } from "@/queries/round"
 
@@ -71,9 +71,11 @@ export function RoundCandidatesDrawer({
             </div>
             <div>
               <h2 className="pp-drawer-name">{roundLabel(round.type)} Candidates</h2>
-              <p className="pp-drawer-email">
-                Stage {round.order} · {round.status}
-              </p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-xs text-muted-foreground">Stage {round.order}</span>
+                <span className="text-xs text-muted-foreground">·</span>
+                <RoundStatusBadge status={round.status} />
+              </div>
             </div>
             <button className="pp-drawer-close" onClick={onClose} aria-label="Close">
               <XCircleIcon size={20} />

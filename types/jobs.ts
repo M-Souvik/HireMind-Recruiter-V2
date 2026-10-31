@@ -32,9 +32,10 @@ export interface Job {
   organization: Organization
   skills: string[]
   created_by: CreatedBy
-  status: "open" | "closed" | "paused"
+  status: "open" | "closed" | "paused" | "scheduled"
   start_time: string
   end_time: string
+  validity?: number
   created_at: string
   updated_at: string
 }

@@ -26,6 +26,11 @@ function StatusBadge({ status }: { status: Job["status"] }) {
             label: "Paused",
             cls: "jl-badge--paused",
         },
+        scheduled: {
+            icon: <ClockIcon className="jl-badge-icon" />,
+            label: "Scheduled",
+            cls: "jl-badge--scheduled",
+        },
     }
     const { icon, label, cls } = map[status] ?? map.open
     return (
